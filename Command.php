@@ -20,7 +20,7 @@ class Command
         $contact = $manager->findById($id);
 
         if($contact === NULL){
-            echo "l'id n° {$id} renseigné n'existe pas\n";
+            throw new InvalidArgumentException("L'id renseigné n'existe pas");
         }else{
             echo $contact->toString();
         }
@@ -72,5 +72,6 @@ class Command
     {
         $manager = new ContactManager();
         $manager->deleteContact($id);
+        
     }
 }

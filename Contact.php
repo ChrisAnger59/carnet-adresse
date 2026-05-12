@@ -78,6 +78,10 @@ class ContactManager
         $query = "DELETE FROM `contact` WHERE `id` = :id";
         $stmt = $connexion->prepare($query);
         $stmt->execute(['id' => $id]);
+
+        if($stmt->rowCount() === 0){
+            throw new InvalidArgumentException("Aucun contact trouvé avec cet id\n");
+        }
     }
 }
 

@@ -18,7 +18,12 @@ while(true){
 
         $id = (int) preg_replace('/\D/', '', $line);
 
-        $commande->detail($id);
+        try{
+            $commande->detail($id);
+        }catch(InvalidArgumentException $erreur){
+            echo "Erreur: " . $erreur->getMessage();
+        }
+        
             
     }elseif(preg_match("/\bcreate\b/", $line)){
 
@@ -28,17 +33,25 @@ while(true){
             $commande->create($infos);
             echo "Nouveau contact créé !\n";
         }catch(InvalidArgumentException $erreur){
-            echo "Erreur: ". $erreur->getMessage();
+            echo "Erreur: " . $erreur->getMessage();
         }catch(Exception $erreur_global){
-            echo "Erreur innattendue\n";
+            echo "Erreur Global\n";
         }
         
     }elseif(preg_match("/\bdelete\b/", $line)){
 
         $id = (int) preg_replace('/\D/', '', $line);
 
-        $commande->delete($id);
-        echo "Contact supprimé\n";
+        try{
+            $commande->delete($id);
+            echo "Contact supprimé\n";
+        }catch(InvalidArgumentException $erreur){
+            echo $erreur->getMessage() . "\n";
+        }catch(PDOException $erreur_pdo){
+            echo "Erreur connexion BDD\n";
+        }catch(Exception $erreur_global){
+            echo "Erreur Global\n";
+        }
 
     }elseif($line === "help"){
 
