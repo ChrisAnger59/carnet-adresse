@@ -1,90 +1,5 @@
 <?php
 
-require_once('DBConnect.php');
-
-class ContactManager
-{
-    public function findAll()
-    {
-        $pdo = new DBConnect;
-        $connexion = $pdo->getPDO();
-
-        $query = "SELECT * FROM `contact`";
-        $stmt = $connexion->prepare($query);
-        $stmt->execute();
-        $liste = $stmt->fetchAll();
-
-        $contacts = [];
-
-        foreach($liste as $row)
-        {
-            $contacts[] = new Contact(
-                $row['id'],
-                $row['name'],
-                $row['email'],
-                $row['phone_number']
-            );
-        }
-
-        return $contacts;
-    }
-
-    public function findById(int $id)
-    {
-        $pdo = new DBConnect();
-        $connexion = $pdo->getPDO();
-
-        $query = "SELECT * FROM `contact` WHERE `id` = :id";
-        $stmt = $connexion->prepare($query);
-        $stmt->execute(['id' => $id]);
-        $info = $stmt->fetch();
-
-        // Si aucune ligne dans le fetch() -> retourne false
-        if(!$info){
-            // $info ne retourne donc aucun resultat
-            return null;
-        }
-
-        $details = new Contact(
-            $info['id'],
-            $info['name'],
-            $info['email'],
-            $info['phone_number']
-        );
-
-        return $details;
-        
-    }
-
-    public function createContact(string $name, string $email, string $phone_number)
-    {
-        $pdo = new DBConnect();
-        $connexion = $pdo->getPDO();
-
-        $query = "INSERT INTO `contact`(`name`, `email`, `phone_number`) VALUES (:name, :email, :phone_number);";
-        $stmt = $connexion->prepare($query);
-        $stmt->execute([
-            'name' => $name,
-            'email' => $email,
-            'phone_number' => $phone_number
-        ]);
-    }
-
-    public function deleteContact(int $id)
-    {
-        $pdo = new DBConnect();
-        $connexion = $pdo->getPDO();
-
-        $query = "DELETE FROM `contact` WHERE `id` = :id";
-        $stmt = $connexion->prepare($query);
-        $stmt->execute(['id' => $id]);
-
-        if($stmt->rowCount() === 0){
-            throw new InvalidArgumentException("Aucun contact trouvé avec cet id\n");
-        }
-    }
-}
-
 class Contact
 {
     private ?int $id;
@@ -92,8 +7,29 @@ class Contact
     private ?string $email;
     private ?string $phone_number;
 
-    public function __construct(?int $id, ?string $name, ?string $email, ?string $phone_number)
+    // Valide et initialise les données de l'instance contact à sa création
+    public function __construct(?int $id, string $name, string $email, string $phone_number)
     {
+        // Si aucun nom, Lève une Exception et stoppe la création de l'objet Contact
+        if(empty($name)){
+
+            throw new InvalidArgumentException("Nom vide\n");
+
+        // Si aucun email ou s'il n'est pas valide 
+        // Lève une Exception et stoppe la création de l'objet Contact
+        }elseif(empty($email) || !self::isValidEmail($email)){
+
+            throw new InvalidArgumentException("email vide ou invalide\n");
+
+        // Si aucun téléphone ou s'il n'est pas valide
+        // Lève une Exception et stoppe la création de l'objet Contact
+        }elseif(empty($phone_number) || !self::isValidNumber($phone_number)){
+
+            throw new InvalidArgumentException("Téléphone vide ou invalide\n");
+
+        }
+
+        // Assigne des valeurs aux propriétés
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
@@ -120,8 +56,21 @@ class Contact
         return $this->phone_number;
     }
 
+    // Formate le contact instancié en une ligne lisible pour l'affichage
     public function toString(): string
     {
-        return $this->id . ", " . $this->name . ", " . $this->email . ", " . $this->phone_number . "\n\n"; 
+        return $this->getId() . ", " . $this->getName() . ", " . $this->getEmail() . ", " . $this->getPhoneNumber() . "\n\n"; 
+    }
+
+    // Méthode static : validation d'une valeur brute (variable) indépendante de l'objet
+    public static function isValidEmail(string $email): bool
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    // Méthode static : validation d'une valeur brute (variable) indépendante de l'objet
+    public static function isValidNumber(string $phone_number): bool
+    {
+        return preg_match('/^[0-9]{10}$/', $phone_number) === 1;
     }
 }

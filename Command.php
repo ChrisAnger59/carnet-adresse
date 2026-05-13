@@ -1,31 +1,50 @@
 <?php
 
-require_once('Contact.php');
+require_once('ContactManager.php');
 
 class Command
 {
+
+    // On déclare une propriété de type ContactManager
+    private ContactManager $manager;
+
+    // A chaque Command on instancie une nouvel instance de ContactManager
+    public function __construct()
+    {
+        $this->manager = new ContactManager();
+    }
+
+    // On appel la méthode findAll() de notre instance ContactManager
+    // Qui renvois un tableau avec un objet Contact par ligne
     public function list()
     {
-        $manager = new ContactManager();
-        $contacts = $manager->findAll();
+        $contacts = $this->manager->findAll();
 
+        // Pour chaques objet Contact on appel la méthode toString()
+        // Pour afficher de façon lisible les infos du Contact
         foreach($contacts as $contact){
             echo $contact->toString();
         }
     }
 
+    // On appel la méthode findById() de notre instance ContactManager
+    // Qui renvois un objet Contact grace à l'$id renseigné en paramètre
     public function detail(int $id)
     {
-        $manager = new ContactManager();
-        $contact = $manager->findById($id);
+        $contact = $this->manager->findById($id);
 
+        // Si aucun objet lève une Exception et stoppe la fonction
         if($contact === NULL){
             throw new InvalidArgumentException("L'id renseigné n'existe pas");
+
+        // Sinon on affiche de façon lisible les infos de l'objet Contact
         }else{
             echo $contact->toString();
         }
     }
 
+    // On appel la méthode createContact() de notre instance ContactManager
+    // Qui ne renvois rien 
     public function create(string $infos_brutes){
 
         // Scinde la chaîne de caractères à chaque virgules dans un tableau (une partie par ligne)
@@ -34,7 +53,7 @@ class Command
         // Si le tableau retourné par $input n'est pas composé de 3 lignes
         if(count($input) !== 3){
 
-            // Créer une Exception et retourne un message
+            // Lève une Exception et retourne un message
             throw new InvalidArgumentException("Informations saisies invalides\n Saisissez : create nom, email, téléphone\n");
 
         }
@@ -45,33 +64,17 @@ class Command
             $email = trim($input[1]);
             $phone_number = trim($input[2]);
 
-            // Si aucun nom saisie, créer une Exception et retourne un message
-            if(empty($name)){
+            // On créer un nouvel objet Contact grace aux variables
+            $contact = new Contact(null, $name, $email, $phone_number);
 
-                throw new InvalidArgumentException("Nom vide\n");
-
-            // Si aucun email saisie ou s'il n'est pas valide 
-            // Créer une Exception et retourne un message
-            }elseif(empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)){
-
-                throw new InvalidArgumentException("email vide ou invalide\n");
-
-            // Si aucun téléphone saisie, s'il n'est pas composé de chiffre entre 0 et 9 ou s'il ne fait pas 10 caractères
-            // Créer une Exception et retourne un message
-            }elseif(empty($phone_number) || !preg_match('/^[0-9]{10}$/', $phone_number)){
-
-                throw new InvalidArgumentException("Téléphone vide ou invalide\n");
-
-            }
-
-            $manager = new ContactManager();
-            $manager->createContact($name, $email, $phone_number);
+            $this->manager->createContact($contact);
     }
 
+    // On appel la méthode deleteContact() de notre instance ContactManager
+    // Qui ne renvois rien
     public function delete(int $id)
     {
-        $manager = new ContactManager();
-        $manager->deleteContact($id);
+        $this->manager->deleteContact($id);
         
     }
 }

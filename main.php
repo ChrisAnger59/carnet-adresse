@@ -1,19 +1,21 @@
 <?php
 
 require_once('Command.php');
+$commande = new Command();
 
 
 while(true){
 
     $line = readline("Entrez votre commande (list, detail, create, delete, help, quit) : ");
-    $commande = new Command();
 
+    /***  COMMANDE SAISIE "LIST" *******/
     if($line === "list"){
 
         echo "\nListe des contacts :\n\n";
         echo "id, name, email, phone number\n\n";
         $commande->list();
 
+    /***  COMMANDE SAISIE "DETAIL" *******/
     }elseif(preg_match("/\bdetail\b/", $line)){
 
         $id = (int) preg_replace('/\D/', '', $line);
@@ -24,7 +26,7 @@ while(true){
             echo "Erreur: " . $erreur->getMessage();
         }
         
-            
+    /***  COMMANDE SAISIE "CREATE" *******/
     }elseif(preg_match("/\bcreate\b/", $line)){
 
         $infos = (string) preg_replace('/^create\s+/i', '', $line);
@@ -38,6 +40,7 @@ while(true){
             echo "Erreur Global\n";
         }
         
+    /***  COMMANDE SAISIE "DELETE" *******/
     }elseif(preg_match("/\bdelete\b/", $line)){
 
         $id = (int) preg_replace('/\D/', '', $line);
@@ -53,6 +56,7 @@ while(true){
             echo "Erreur Global\n";
         }
 
+    /***  COMMANDE SAISIE "HELP" *******/
     }elseif($line === "help"){
 
         echo "\nhelp : affiche cette aide\n\n";
@@ -63,6 +67,7 @@ while(true){
         echo "Attention à la syntaxe des commandes, les espaces et les virgules sont important\n";
         echo "(Il n'est pas necessaire de mettre les '[ ]')\n\n\n";
 
+    /***  COMMANDE SAISIE "QUIT" *******/
     }elseif($line === "quit"){
 
         exit(0);
