@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once('Contact.php');
 require_once('DBConnect.php');
 
@@ -34,15 +36,19 @@ class ContactManager
         $contacts = [];
 
         // Pour chaque lignes du tableau $liste
-        foreach($liste as $row)
+        foreach ($liste as $row)
         {
-            // On instancie un nouvel objet Contact qu'on stock dans le tableau $contacts
-            $contacts[] = new Contact(
-                $row['id'],
-                $row['name'],
-                $row['email'],
-                $row['phone_number']
-            );
+            try {
+                // On instancie un nouvel objet Contact qu'on stock dans le tableau $contacts
+                $contacts[] = new Contact(
+                    $row['id'],
+                    $row['name'],
+                    $row['email'],
+                    $row['phone_number']
+                );
+            } catch (InvalidArgumentException $erreur) {
+                echo $erreur->getMessage();
+            }
         }
 
         return $contacts;
@@ -62,7 +68,7 @@ class ContactManager
         $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Si $info retourne false
-        if(!$info){
+        if (!$info) {
             // Aucun contact trouvé, on retourne null pour le signaler à l'appelant
             return null;
         }
@@ -104,7 +110,7 @@ class ContactManager
 
         // Si aucune ligne n'a été modifiée apreès la requête 
         // Lève une Exception
-        if($stmt->rowCount() === 0){
+        if ($stmt->rowCount() === 0) {
             throw new InvalidArgumentException("Aucun contact trouvé avec cet id\n");
         }
     }

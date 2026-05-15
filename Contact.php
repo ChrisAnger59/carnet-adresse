@@ -1,76 +1,90 @@
 <?php
 
+declare(strict_types=1);
+
+require_once('ContactService.php');
+
+
 class Contact
 {
-    private ?int $id;
-    private ?string $name;
-    private ?string $email;
-    private ?string $phone_number;
-
     // Valide et initialise les données de l'instance contact à sa création
-    public function __construct(?int $id, string $name, string $email, string $phone_number)
+    public function __construct (
+        private ?int $id, 
+        private string $name, 
+        private string $email, 
+        private string $phone_number) 
+        
     {
-        // Si aucun nom, Lève une Exception et stoppe la création de l'objet Contact
-        if(empty($name)){
-
-            throw new InvalidArgumentException("Nom vide\n");
-
-        // Si aucun email ou s'il n'est pas valide 
-        // Lève une Exception et stoppe la création de l'objet Contact
-        }elseif(empty($email) || !self::isValidEmail($email)){
-
-            throw new InvalidArgumentException("email vide ou invalide\n");
-
-        // Si aucun téléphone ou s'il n'est pas valide
-        // Lève une Exception et stoppe la création de l'objet Contact
-        }elseif(empty($phone_number) || !self::isValidNumber($phone_number)){
-
-            throw new InvalidArgumentException("Téléphone vide ou invalide\n");
-
-        }
-
-        // Assigne des valeurs aux propriétés
+        // Assigne et valide des valeurs aux propriétés
         $this->id = $id;
-        $this->name = $name;
-        $this->email = $email;
-        $this->phone_number = $phone_number;
+        $this->setName($name);
+        $this->setEmail($email);
+        $this->setPhoneNumber($phone_number);
     }
 
-    public function getId(): ?int
+    /********* GETTERS *********/
+    public function getId(): int
     {
        return $this->id; 
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhoneNumber(): string
     {
         return $this->phone_number;
     }
 
+
+    /********* SETTERS *********/
+
+    public function setName(string $name): void
+    {
+        // Si aucun nom, Lève une Exception
+        if (!ContactService::isValidName($name)) {
+
+            throw new InvalidArgumentException("Nom vide\n");
+        }
+
+        $this->name = $name;
+    }
+
+    public function setEmail(string $email): void
+    {
+        // Si aucun email ou s'il n'est pas valide 
+        // Lève une Exception
+        if (empty($email) || !ContactService::isValidEmail($email)) {
+
+            throw new InvalidArgumentException("email vide ou invalide\n");
+        }
+
+        $this->email = $email;
+    }
+
+    public function setPhoneNumber(string $phone_number): void
+    {
+        // Si aucun téléphone ou s'il n'est pas valide
+        // Lève une Exception
+        if (empty($phone_number) || !ContactService::isValidNumber($phone_number)) {
+
+            throw new InvalidArgumentException("Téléphone vide ou invalide\n");
+        }
+
+        $this->phone_number = $phone_number;
+    }
+
+    
     // Formate le contact instancié en une ligne lisible pour l'affichage
-    public function toString(): string
+    public function __toString(): string
     {
-        return $this->getId() . ", " . $this->getName() . ", " . $this->getEmail() . ", " . $this->getPhoneNumber() . "\n\n"; 
-    }
-
-    // Méthode static : validation d'une valeur brute (variable) indépendante de l'objet
-    public static function isValidEmail(string $email): bool
-    {
-        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-    }
-
-    // Méthode static : validation d'une valeur brute (variable) indépendante de l'objet
-    public static function isValidNumber(string $phone_number): bool
-    {
-        return preg_match('/^[0-9]{10}$/', $phone_number) === 1;
+        return ContactService::ligneTexte($this);
     }
 }

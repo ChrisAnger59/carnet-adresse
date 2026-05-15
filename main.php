@@ -1,63 +1,64 @@
 <?php
 
+declare(strict_types=1);
+
 require_once('Command.php');
 $commande = new Command();
 
 
-while(true){
+while (true) {
 
     $line = readline("Entrez votre commande (list, detail, create, delete, help, quit) : ");
 
     /***  COMMANDE SAISIE "LIST" *******/
-    if($line === "list"){
+    if ($line === "list") {
 
         echo "\nListe des contacts :\n\n";
         echo "id, name, email, phone number\n\n";
         $commande->list();
 
     /***  COMMANDE SAISIE "DETAIL" *******/
-    }elseif(preg_match("/\bdetail\b/", $line)){
-
+    } elseif (preg_match("/\bdetail\b/", $line)) {
         $id = (int) preg_replace('/\D/', '', $line);
 
-        try{
+        try {
             $commande->detail($id);
-        }catch(InvalidArgumentException $erreur){
+        } catch (InvalidArgumentException $erreur) {
             echo "Erreur: " . $erreur->getMessage();
         }
         
     /***  COMMANDE SAISIE "CREATE" *******/
-    }elseif(preg_match("/\bcreate\b/", $line)){
+    } elseif (preg_match("/\bcreate\b/", $line)) {
 
         $infos = (string) preg_replace('/^create\s+/i', '', $line);
 
-        try{
+        try {
             $commande->create($infos);
             echo "Nouveau contact créé !\n";
-        }catch(InvalidArgumentException $erreur){
+        } catch (InvalidArgumentException $erreur) {
             echo "Erreur: " . $erreur->getMessage();
-        }catch(Exception $erreur_global){
+        } catch (Exception $erreur_global) {
             echo "Erreur Global\n";
         }
         
     /***  COMMANDE SAISIE "DELETE" *******/
-    }elseif(preg_match("/\bdelete\b/", $line)){
+    } elseif (preg_match("/\bdelete\b/", $line)) {
 
         $id = (int) preg_replace('/\D/', '', $line);
 
-        try{
+        try {
             $commande->delete($id);
             echo "Contact supprimé\n";
-        }catch(InvalidArgumentException $erreur){
+        } catch (InvalidArgumentException $erreur) {
             echo $erreur->getMessage() . "\n";
-        }catch(PDOException $erreur_pdo){
+        } catch (PDOException $erreur_pdo) {
             echo "Erreur connexion BDD\n";
-        }catch(Exception $erreur_global){
+        } catch(Exception $erreur_global) {
             echo "Erreur Global\n";
         }
 
     /***  COMMANDE SAISIE "HELP" *******/
-    }elseif($line === "help"){
+    } elseif ($line === "help") {
 
         echo "\nhelp : affiche cette aide\n\n";
         echo "list : liste les contacts\n\n";
@@ -68,11 +69,11 @@ while(true){
         echo "(Il n'est pas necessaire de mettre les '[ ]')\n\n\n";
 
     /***  COMMANDE SAISIE "QUIT" *******/
-    }elseif($line === "quit"){
+    } elseif ($line === "quit") {
 
         exit(0);
 
-    }else{
+    } else {
             echo "Erreur: la commande saisie: '{$line}' n'existe pas\n";
     }
 }

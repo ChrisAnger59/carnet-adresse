@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once('ContactManager.php');
 
 class Command
@@ -23,7 +25,7 @@ class Command
         // Pour chaques objet Contact on appel la méthode toString()
         // Pour afficher de façon lisible les infos du Contact
         foreach($contacts as $contact){
-            echo $contact->toString();
+            echo $contact;
         }
     }
 
@@ -34,12 +36,12 @@ class Command
         $contact = $this->manager->findById($id);
 
         // Si aucun objet lève une Exception et stoppe la fonction
-        if($contact === NULL){
-            throw new InvalidArgumentException("L'id renseigné n'existe pas");
+        if ($contact === NULL) {
+            throw new InvalidArgumentException("L'id renseigné n'existe pas\n");
 
         // Sinon on affiche de façon lisible les infos de l'objet Contact
-        }else{
-            echo $contact->toString();
+        } else {
+            echo $contact;
         }
     }
 
@@ -51,7 +53,7 @@ class Command
         $input = explode(',', $infos_brutes);
 
         // Si le tableau retourné par $input n'est pas composé de 3 lignes
-        if(count($input) !== 3){
+        if (count($input) !== 3) {
 
             // Lève une Exception et retourne un message
             throw new InvalidArgumentException("Informations saisies invalides\n Saisissez : create nom, email, téléphone\n");
