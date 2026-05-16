@@ -11,12 +11,12 @@ class ContactService
 
     public static function isValidEmail(string $email): bool
     {
-        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false && !empty(trim($email));
     }
 
     public static function isValidNumber(string $phone_number): bool
     {
-        return preg_match('/^[0-9]{10}$/', $phone_number) === 1;
+        return preg_match('/^[0-9]{10}$/', $phone_number) === 1 && !empty(trim($phone_number));
     }
 
     // Formate le contact instancié en une ligne lisible pour l'affichage

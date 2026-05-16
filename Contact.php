@@ -61,7 +61,7 @@ class Contact
     {
         // Si aucun email ou s'il n'est pas valide 
         // Lève une Exception
-        if (empty($email) || !ContactService::isValidEmail($email)) {
+        if (!ContactService::isValidEmail($email)) {
 
             throw new InvalidArgumentException("email vide ou invalide\n");
         }
@@ -73,7 +73,7 @@ class Contact
     {
         // Si aucun téléphone ou s'il n'est pas valide
         // Lève une Exception
-        if (empty($phone_number) || !ContactService::isValidNumber($phone_number)) {
+        if (!ContactService::isValidNumber($phone_number)) {
 
             throw new InvalidArgumentException("Téléphone vide ou invalide\n");
         }
